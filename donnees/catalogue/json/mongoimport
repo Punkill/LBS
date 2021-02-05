@@ -1,0 +1,11 @@
+
+##
+## les catégories
+#
+ mongoimport -dcatalogue --collection categories --jsonArray < categories.json
+
+ ##
+ ## les sandwichs
+ ##
+
+ mongoimport -dcatalogue --collection sandwiches --jsonArray < sandwichs.json

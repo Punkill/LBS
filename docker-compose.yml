@@ -1,0 +1,137 @@
+#
+#  Services pour le projet lbs
+#  Basé sur le template et les images PHP disponibles ici :
+#  https://gitlab.univ-lorraine.fr/canals5/docker-php/
+#
+#
+
+version: '3'
+networks:
+  lbs.net:
+    driver: bridge
+services:
+
+#
+# Services PHP pour les API
+#
+
+#
+# API de prise de commandes
+# disponible sur l'url https://api.commande.local:19043
+#
+  api.commande:
+    image: canals/php:latest
+    environment:
+      - VHOST_HOSTNAME=api.commande.local
+      - VHOST_DOCROOT=/var/www/api
+    ports:
+      - 19080:80
+      - 19043:443
+    volumes:
+      - ./lbs_commande_service/api:/var/www/api
+      - ./lbs_commande_service/src:/var/www/src
+    working_dir: /var/www/src
+    networks:
+      - lbs.net
+    links:
+      - mysql.commande:dbcom
+      - api.catalogue:api.catalogue.local
+
+#
+# API de navigation dans le catalogue
+# disponible sur l'url https://api.catalogue.local:19143
+#
+  api.catalogue:
+    image: canals/php:latest
+    environment:
+      - VHOST_HOSTNAME=api.catalogue.local
+      - VHOST_DOCROOT=/var/www/api
+    ports:
+      - 19180:80
+      - 19143:443
+    volumes:
+      - ./lbs_catalogue_service/api:/var/www/api
+      - ./lbs_catalogue_service/src:/var/www/src
+    working_dir: /var/www/src
+    networks:
+      - lbs.net
+    links:
+#      - mongo.cat:dbcat
+      - mysql.catalogue:dbcat
+
+#
+# Services de gestion des données
+#
+
+#
+# Base de données des commandes, utilisée par le service de prise
+# de commandes
+#
+  mysql.commande:
+    image: 'mariadb:latest'
+    command: '--default-authentication-plugin=mysql_native_password --character-set-server=utf8 --collation-server=utf8_general_ci'
+    environment:
+      - MYSQL_ROOT_PASSWORD=comroot
+      - MYSQL_USER=command_lbs
+      - MYSQL_PASSWORD=command_lbs
+      - MYSQL_DATABASE=command_lbs
+    ports:
+      - '3307:3306'
+    networks:
+      - lbs.net
+    volumes:
+      - './lbs_commande_service/sql:/var/sql'
+
+#
+# Base de données du catalogue, utilisée par le service catalogue
+#
+  mysql.catalogue:
+    image: 'mariadb:latest'
+    command: '--default-authentication-plugin=mysql_native_password --character-set-server=utf8 --collation-server=utf8_general_ci'
+    environment:
+      - MYSQL_ROOT_PASSWORD=catroot
+      - MYSQL_USER=cat_lbs
+      - MYSQL_PASSWORD=cat_lbs
+      - MYSQL_DATABASE=cat_lbs
+    ports:
+      - '3309:3306'
+    networks:
+      - lbs.net
+    volumes:
+      - './lbs_catalogue_service/sql:/var/sql'
+
+#
+# adminer, pour la gestion des bases sql
+# peut être remplacé par phpmydamin
+#
+  adminer:
+    image: adminer
+    ports:
+      - 8080:8080
+    networks:
+      - lbs.net
+    links:
+      - mysql.commande:command
+      - mysql.catalogue:catalogue
+
+#
+# mongo service, pour un catalogue mongo
+#
+
+#  mongo.cat:
+#    image: 'mongo:latest'
+#    volumes:
+#      - ./lbs_catalogue_service/data:/var/data
+#    working_dir: /var/data
+#    networks:
+#      - lbs.net
+#    ports:
+#      - 27018:27017
+#  mongo-express:
+#    image: mongo-express:latest
+#    networks:
+#      - lbs.net
+#    ports:
+#      - 8081:8081
+#    links:
+#      - mongo.cat:mongo

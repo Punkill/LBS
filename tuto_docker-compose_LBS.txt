@@ -1,0 +1,8 @@
+Aller dans le répertoire lbs.squelette.2020
+faire docker-compose up --no-start
+docker-compose ps (pour voir les états des conteneurs crée)
+docker-compose start (va démarrer tout les conteneurs) 
+Pour accéder à Adminer (localhost:8080, voir docker-compose.yml pour obtenir le compte user et mdp)
+Installation composer.json :
+docker exec -it lbssquelette2020_api.commande_1 /bin/bash
+puis composer install  (le faire aussi avec catalogue)
