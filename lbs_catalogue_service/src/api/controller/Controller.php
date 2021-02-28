@@ -96,7 +96,7 @@ class Controller
         {
             $res = $res->withStatus(404)
                         ->withHeader('Content-Type','application/json');
-            $res->getBody()->write(json_encode("<h1>Sandwich Not Found</h1>"));
+            $res->getBody()->write(json_encode("Sandwich Not Found"));
             return $res;
         }
     }

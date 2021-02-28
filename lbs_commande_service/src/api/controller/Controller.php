@@ -4,6 +4,7 @@ use\Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
 use \lbs\command\api\model\Commande;
 use \Ramsey\Uuid\Uuid;
+use GuzzleHttp\Client;
 class Controller
 {
     protected $c;
@@ -92,7 +93,13 @@ class Controller
 
     public function createCommandeTest(Request $req, Response $res,array $args): Response
     {
+        $client = new Client([
+            'base_uri' => 'http://api.catalogue.local',
+            'auth' => ['cat_lbs','cat_lbs','digest']
+            //'timeout' => 3.0,
+        ]);
         $bodyReq = json_decode($req->getBody());
+        $items = $bodyReq->items;
         $commande = new Commande();
         $uuid1 = Uuid::uuid1();
         $token = random_bytes(32);
@@ -101,6 +108,11 @@ class Controller
         //$date->getTimestamp();
         $heure = date_create_from_format('H:i', $bodyReq->livraison->heure);
         //$livraison->getTimestamp();
+        foreach($items as $item)
+        {
+            $response = $client->get($item->uri);
+            $body = $response->getBody();
+        }
         $commande->nom = $bodyReq->nom;
         $commande->mail = $bodyReq->mail;
         $commande->montant = 0;
@@ -130,7 +142,8 @@ class Controller
                 ),
                 'id' => $commande->id,
                 'token' => $commande->token,
-                'montant' => $commande->montant
+                'montant' => $commande->montant,
+                'items' => $items
             )
         )));
         return $res;

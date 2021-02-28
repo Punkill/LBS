@@ -26,6 +26,6 @@ $app->get('/hello',function(Request $req, Response $res, array $args) : Response
     $res->getBody()->write(json_encode("<h1>Test</h1>"));
     return $res;
 });
-$app->post('/commandes[/]', Controller::class.':createCommande')->setName('createCommande');
+$app->post('/commandes[/]', Controller::class.':createCommandeTest')->setName('createCommande');
 $app->get('/commandes/{id}', Controller::class.':getCommande')->setName('getCommande');
 $app->run();

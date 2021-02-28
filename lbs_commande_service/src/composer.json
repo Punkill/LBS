@@ -6,8 +6,8 @@
     "illuminate/database":"^8.0",
     "monolog/monolog": "^2.1",
     "ramsey/collection" : "^1.0",
-    "ramsey/uuid" : "^4.1"
-    
+    "ramsey/uuid" : "^4.1",
+    "guzzlehttp/guzzle": "^7.2"
   },
   "autoload": {
     "psr-4" : {
