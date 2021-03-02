@@ -22,9 +22,7 @@ class Controller
         $token = random_bytes(32);
         $token = bin2hex($token);
         $date = date_create_from_format('d-m-Y',$bodyReq->livraison->date);
-        //$date->getTimestamp();
         $heure = date_create_from_format('H:i', $bodyReq->livraison->heure);
-        //$livraison->getTimestamp();
         $commande->nom = $bodyReq->nom;
         $commande->mail = $bodyReq->mail;
         $commande->montant = 0;
@@ -121,7 +119,7 @@ class Controller
         $commande->livraison = $date->format('Y-m-d').' '.$heure->format('H:i:s');
         try
         {
-            $commande->save();
+            //$commande->save();
         }
         catch(\Exception $e)
         {
