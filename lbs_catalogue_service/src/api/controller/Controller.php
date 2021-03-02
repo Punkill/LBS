@@ -60,15 +60,15 @@ class Controller
 
     public function showSandwich(Request $req, Response $res,array $args): Response
     {
-        $id = $args['id'];
+        $ref = $args['ref'];
         /*$sandwich = Sandwich::where('id','=',$id)->whereHas('Categories',function($q){
             $q->select('id','nom');
         })->first();*/
-        $sandwich = Sandwich::select()->where('id','=',$id)->with('Categories')->first();
+        $sandwich = Sandwich::select()->where('ref','=',$ref)->with('Categories')->first();
         if($sandwich != null)
         {
-            $url_Sand = $this->c->get('router')->pathFor('showSand',['id'=>$id]);
-            $url_SandCat = $this->c->get('router')->pathFor('sandCat',['id'=>$id]);
+            $url_Sand = $this->c->get('router')->pathFor('showSand',['ref'=>$ref]);
+            $url_SandCat = $this->c->get('router')->pathFor('sandCat',['ref'=>$ref]);
             $result['type'] = "resource";
             $result['links'] = array(
                 'links' => array(
