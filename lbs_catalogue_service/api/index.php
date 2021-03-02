@@ -57,11 +57,11 @@ $app = new \Slim\App($c);
 });*/
 $app->get('/sandwichs[/]', Controller::class.':showSandwichs')->setName('sandwichs');
 
-$app->get('/sandwichs/{ref}[/]', Controller::class.':showSandwich')->setName('showSand');
+$app->get('/sandwichs/{id}[/]', Controller::class.':showSandwich')->setName('showSand');
 
-$app->get('/sandwichs/{ref}/categories', Controller::class.':sandwichsCategories')->setName('sandCat');
+$app->get('/sandwichs/{id}/categories[/]', Controller::class.':sandwichsCategories')->setName('sandCat');
 
-$app->get('/categories/{id}/sandwichs', Controller::class.':categoriesSandwichs')->setName('catSand');
+$app->get('/categories/{id}/sandwichs[/]', Controller::class.':categoriesSandwichs')->setName('catSand');
 
 $app->get('/categories/{id}[/]', Controller::class.':categories')->setName('categories');
 $app->run();
