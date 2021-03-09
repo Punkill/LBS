@@ -36,7 +36,7 @@ services:
     links:
       - mysql.commande:dbcom
       - api.catalogue:api.catalogue.local
-
+      - api.fidelisation:api.fidelisation.local
 #
 # API de navigation dans le catalogue
 # disponible sur l'url https://api.catalogue.local:19143
@@ -58,7 +58,26 @@ services:
     links:
 #      - mongo.cat:dbcat
       - mysql.catalogue:dbcat
-
+#
+# API de fidélisation
+#
+#
+  api.fidelisation:
+    image: canals/php:latest
+    environment:
+      - VHOST_HOSTNAME=api.fidelisation.local
+      - VHOST_DOCROOT=/var/www/api
+    ports:
+      - 19280:80
+      - 19243:443
+    volumes:
+      - ./lbs_fidelisation_service/api:/var/www/api
+      - ./lbs_fidelisation_service/src:/var/www/src
+    working_dir: /var/www/src
+    networks:
+      - lbs.net
+    links:
+      - mysql.fidelisation:dbfid
 #
 # Services de gestion des données
 #
@@ -99,6 +118,24 @@ services:
       - lbs.net
     volumes:
       - './lbs_catalogue_service/sql:/var/sql'
+#
+# Base de données de la fidélisation, utilisée par le service fidélisation
+#
+
+  mysql.fidelisation:
+    image: 'mariadb:latest'
+    command: '--default-authentication-plugin=mysql_native_password --character-set-server=utf8 --collation-server=utf8_general_ci'
+    environment:
+      - MYSQL_ROOT_PASSWORD=fidroot
+      - MYSQL_USER=fid_lbs
+      - MYSQL_PASSWORD=fid_lbs
+      - MYSQL_DATABASE=fid_lbs
+    ports:
+      - '3311:3306'
+    networks:
+      - lbs.net
+    volumes:
+      - './lbs_fidelisation_service/sql:/var/sql'
 
 #
 # adminer, pour la gestion des bases sql
@@ -113,6 +150,7 @@ services:
     links:
       - mysql.commande:command
       - mysql.catalogue:catalogue
+      - mysql.fidelisation:fidelisation
 
 #
 # mongo service, pour un catalogue mongo

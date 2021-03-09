@@ -16,9 +16,14 @@ use lbs\command\api\controller\Controller;
 
 $c = new \Slim\Container(array_merge($config_slim, $errors));
 $app = new \Slim\App($c);
+$app->get('/hello',function(Request $req, Response $res, array $args) : Response
+{
+    $res = $res->withStatus(200)
+                ->withHeader('Content-Type','application/json');
+    $res->getBody()->write(json_encode("Test"));
+    return $res;
+});
 //$app->add(\lbs\command\api\middlewares\Cors::class.'checkAndAddCorsHeaders');
-$app->post('/commandes[/]', Controller::class.':createCommande')->setName('createCommande');
-$app->get('/commandes/{id}[/]', Controller::class.':getCommande')->setName('getCommande');
 $app->options('/{routes:.+}', function ($request, $response, $args) {
     return $response;
 });

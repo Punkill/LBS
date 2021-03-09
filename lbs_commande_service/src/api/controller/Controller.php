@@ -31,7 +31,7 @@ class Controller
         $date = date_create_from_format('d-m-Y',$bodyReq->livraison->date);
         $heure = date_create_from_format('H:i', $bodyReq->livraison->heure);
         $montant = 0;
-        $commande->nom = $bodyReq->nom;
+        $commande->nom = $bodyReq->nom; //ajouter filter
         $commande->mail = $bodyReq->mail;
         $commande->id = $uuid1;
         $commande->token = $token;
@@ -115,6 +115,7 @@ class Controller
             $res->getBody()->write(json_encode(array('error' => 'Command not found')));
             return $res;
         }
+        //passer en middleware
         if($commande->token == ($token || $header))
         {
             $res = $res->withStatus(200)

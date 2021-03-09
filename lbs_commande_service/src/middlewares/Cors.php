@@ -4,7 +4,7 @@ Class Cors
 {
     private $c;
 
-    public function __construct(\Slim\Container $c = null)
+    public function __construct(\Slim\Container $c)
     {
         $this->c = $c;
     }
