@@ -63,7 +63,7 @@ class Controller
             {
                 //Erreur not found a compléter
                 $code = $response->getStatusCode();
-                //$commande->delete();
+                $commande->delete();
             }
         }
         //Save de la commande
