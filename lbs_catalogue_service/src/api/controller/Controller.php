@@ -51,7 +51,18 @@ class Controller
                 'href' => $url_sandwichs."?page=1&size=$size"
             )
         );
-        $result['sandwichs'] = $rows;
+        for($i=0;$i<$rows->count();$i++)
+        {
+            $result['sandwichs'][$i] = array(
+                'sandwich' => $rows[$i],
+                'links' => array(
+                    'self' => array(
+                        'href' => $this->c->get('router')->pathFor('showSand',['id'=>$rows[$i]['id']])
+                    )
+                )
+            );
+        };
+        //$result['sandwichs'] = $rows;
         $res = $res->withStatus(200)
                     ->withHeader('Content-Type','application/json');
         $res->getBody()->write(json_encode($result));

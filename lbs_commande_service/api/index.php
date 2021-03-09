@@ -12,20 +12,21 @@ $db->bootEloquent();             /* établir la connexion */
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
 use lbs\command\api\controller\Controller;
-$configuration = [
-    'settings' => [
-        'displayErrorDetails' => true,
-    ],
-];
+
+
 $c = new \Slim\Container(array_merge($config_slim, $errors));
 $app = new \Slim\App($c);
-$app->get('/hello',function(Request $req, Response $res, array $args) : Response
+/*$app->get('/hello',function(Request $req, Response $res, array $args) : Response
 {
     $res = $res->withStatus(200)
                 ->withHeader('Content-Type','application/json');
     $res->getBody()->write(json_encode("<h1>Test</h1>"));
     return $res;
-});
+});*/
+//$app->add(\lbs\command\api\middlewares\Cors::class.'checkAndAddCorsHeaders');
 $app->post('/commandes[/]', Controller::class.':createCommandeTest')->setName('createCommande');
-$app->get('/commandes/{id}', Controller::class.':getCommande')->setName('getCommande');
+$app->get('/commandes/{id}[/]', Controller::class.':getCommande')->setName('getCommande');
+$app->options('/{routes:.+}', function ($request, $response, $args) {
+    return $response;
+});
 $app->run();
