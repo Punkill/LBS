@@ -11,7 +11,7 @@ $db->setAsGlobal();              /* rendre la connexion visible dans tout le pro
 $db->bootEloquent();             /* établir la connexion */
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
-use lbs\command\api\controller\Controller;
+use \lbs\fidelisation\api\controller\Controller;
 
 
 $c = new \Slim\Container(array_merge($config_slim, $errors));

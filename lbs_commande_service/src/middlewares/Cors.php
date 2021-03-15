@@ -8,4 +8,6 @@ Class Cors
     {
         $this->c = $c;
     }
+
+    
 }

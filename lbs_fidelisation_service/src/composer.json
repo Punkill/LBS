@@ -6,7 +6,8 @@
     "monolog/monolog": "^2.1",
     "ramsey/collection" : "^1.0",
     "ramsey/uuid" : "^4.1",
-    "guzzlehttp/guzzle": "^7.2"
+    "guzzlehttp/guzzle": "^7.2",
+    "firebase/php-jwt": "^5.0.0"
   },
   "autoload": {
     "psr-4" : {
