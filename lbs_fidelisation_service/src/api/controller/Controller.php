@@ -46,7 +46,10 @@ Class Controller
         }
         catch(\Exception $e)
         {
-
+            $res = $res->withStatus(500)
+                        ->withHeader('Content-Type','application/json');
+            $res->getBody()->write(json_encode($res));
+            return $res;
         }
         $token = JWT::encode([
             'iss' => 'http://api.fidelisation.local/auth',
@@ -65,5 +68,61 @@ Class Controller
                     ->withHeader('Content-Type','application/json');
         $res->getBody()->write(json_encode($data));
         return $res;
+    }
+
+    public function getCarte(Request $req, Response $res,array $args): Response
+    {
+        if(!$req->hasHeader('Authorization'))
+        {
+            $res = $res->withStatus(401)
+                        ->withHeader('Content-Type','application/json')
+                        ->withHeader('WWW-authenticate');
+            $res->getBody()->write(json_encode(array(
+                'type' => 'error',
+                'error' => 401,
+                'message' => 'no authorization header present'
+            )));
+            return $res;
+        }
+
+        try
+        {
+            $h = $req->getHeader('Authorization')[0];
+            $tokenstring= sscanf($h, "Bearer %s")[0];
+            $token = JWT::decode($tokenstring, 'CleAuth', ['HS512']);
+            $carte = Carte::Select('nom_client','mail_client','cumul_achats','cumul_commandes')->where('id','=',$token->cid)->firstOrFail();
+            $res = $res->withStatus(200)
+                        ->withHeader('Content-Type','application/json');
+            $res->getBody()->write(json_encode($carte));
+            return $res;
+        }
+        catch(ExpiredException $e)
+        {
+            $res = $res->withStatus(401)
+                        ->withHeader('Content-Type','application/json');
+            $res->getBody()->write(json_encode($e));
+            return $res;
+        }
+        catch(SignatureInvalidException $e)
+        {
+            $res = $res->withStatus(401)
+                        ->withHeader('Content-Type','application/json');
+            $res->getBody()->write(json_encode($e));
+            return $res;
+        }
+        catch (BeforeValidException $e)
+        {
+            $res = $res->withStatus(401)
+                        ->withHeader('Content-Type','application/json');
+            $res->getBody()->write(json_encode($e));
+            return $res;
+        }
+        catch(\UnexpectedValueException $e)
+        {
+            $res = $res->withStatus(401)
+                        ->withHeader('Content-Type','application/json');
+            $res->getBody()->write(json_encode($e));
+            return $res;
+        }
     }
 }

@@ -24,6 +24,7 @@ $app = new \Slim\App($c);
     return $res;
 });*/
 $app->post('/cartes/{id}/auth[/]', Controller::class.':auth')->setName('auth');
+$app->get('/cartes/{id}', Controller::class.':getCarte');
 //$app->add(\lbs\command\api\middlewares\Cors::class.'checkAndAddCorsHeaders');
 $app->options('/{routes:.+}', function ($request, $response, $args) {
     return $response;
