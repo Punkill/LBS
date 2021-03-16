@@ -12,7 +12,7 @@ $db->bootEloquent();             /* établir la connexion */
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
 use \lbs\fidelisation\api\controller\Controller;
-
+use \lbs\fidelisation\middlewares\Cors;
 
 $c = new \Slim\Container(array_merge($config_slim, $errors));
 $app = new \Slim\App($c);
@@ -24,7 +24,8 @@ $app = new \Slim\App($c);
     return $res;
 });*/
 $app->post('/cartes/{id}/auth[/]', Controller::class.':auth')->setName('auth');
-$app->get('/cartes/{id}', Controller::class.':getCarte');
+$app->get('/cartes/{id}', Controller::class.':getCarte')
+    ->add(Cors::class.':verificationAjoutHeader');
 //$app->add(\lbs\command\api\middlewares\Cors::class.'checkAndAddCorsHeaders');
 $app->options('/{routes:.+}', function ($request, $response, $args) {
     return $response;

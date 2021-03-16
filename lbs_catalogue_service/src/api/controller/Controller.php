@@ -16,7 +16,7 @@ class Controller
     {
         $type = $req->getQueryParam('t',null);
         $page = $req->getQueryParam('page',1);
-        $size = $req->getQueryParam('size',2);
+        $size = $req->getQueryParam('size',2); //Controler la taille
         $sandwichs = Sandwich::select()->orderBy('nom');
         if(!is_null($type))
         {

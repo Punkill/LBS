@@ -1,5 +1,5 @@
 <?php
-namespace lbs\command\middlewares;
+namespace lbs\fidelisation\middlewares;
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
 Class Cors

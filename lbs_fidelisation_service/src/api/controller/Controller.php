@@ -14,8 +14,7 @@ Class Controller
 {
     protected $c;
 
-    public function __construct(\Slim\Container $c = null)
-    {
+    public function __construct(\Slim\Container $c){
         $this->c = $c;
     }
 
@@ -58,7 +57,7 @@ Class Controller
             'exp' => time()+3600,
             'cid' => $carte->id
         ],
-        'CleAuth', 'HS512');
+        $this->c->settings['secrets'], 'HS512');
 
         $data = [
             'carte' => $carte->toArray(),
@@ -87,9 +86,10 @@ Class Controller
 
         try
         {
+            $secrets = $this->c['settings']['secrets'];
             $h = $req->getHeader('Authorization')[0];
             $tokenstring= sscanf($h, "Bearer %s")[0];
-            $token = JWT::decode($tokenstring, 'CleAuth', ['HS512']);
+            $token = JWT::decode($tokenstring, $secrets, ['HS512']);
             $carte = Carte::Select('nom_client','mail_client','cumul_achats','cumul_commandes')->where('id','=',$token->cid)->firstOrFail();
             $res = $res->withStatus(200)
                         ->withHeader('Content-Type','application/json');

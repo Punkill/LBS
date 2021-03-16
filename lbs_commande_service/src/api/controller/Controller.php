@@ -31,8 +31,8 @@ class Controller
         $date = date_create_from_format('d-m-Y',$bodyReq->livraison->date);
         $heure = date_create_from_format('H:i', $bodyReq->livraison->heure);
         $montant = 0;
-        $commande->nom = $bodyReq->nom; //ajouter filter
-        $commande->mail = $bodyReq->mail;
+        $commande->nom = filter_var($bodyReq->nom,FILTER_SANITIZE_SPECIAL_CHARS); //ajouter filter
+        $commande->mail = filter_var($bodyReq->mail,FILTER_VALIDATE_EMAIL);
         $commande->id = $uuid1;
         $commande->token = $token;
         $commande->livraison = $date->format('Y-m-d').' '.$heure->format('H:i:s');
