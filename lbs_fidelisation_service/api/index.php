@@ -13,20 +13,21 @@ use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
 use \lbs\fidelisation\api\controller\Controller;
 use \lbs\fidelisation\middlewares\Cors;
+use \lbs\fidelisation\middlewares\CheckAuthorization;
+use \lbs\fidelisation\middlewares\CheckToken;
 
 $c = new \Slim\Container(array_merge($config_slim, $errors));
 $app = new \Slim\App($c);
-/*$app->get('/hello',function(Request $req, Response $res, array $args) : Response
-{
-    $res = $res->withStatus(200)
-                ->withHeader('Content-Type','application/json');
-    $res->getBody()->write(json_encode("Test"));
-    return $res;
-});*/
-$app->post('/cartes/{id}/auth[/]', Controller::class.':auth')->setName('auth');
+
+$app->post('/cartes/{id}/auth[/]', Controller::class.':auth')->setName('auth')
+    ->add(Cors::class.':verificationAjoutHeader')
+    ->add(CheckAuthorization::class.':checkAuthorization');
+
 $app->get('/cartes/{id}', Controller::class.':getCarte')
-    ->add(Cors::class.':verificationAjoutHeader');
-//$app->add(\lbs\command\api\middlewares\Cors::class.'checkAndAddCorsHeaders');
+    ->add(Cors::class.':verificationAjoutHeader')
+    ->add(CheckAuthorization::class.':checkAuthorization')
+    ->add(CheckToken::class.':checkToken');
+
 $app->options('/{routes:.+}', function ($request, $response, $args) {
     return $response;
 });

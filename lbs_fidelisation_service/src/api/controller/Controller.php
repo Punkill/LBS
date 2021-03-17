@@ -20,18 +20,6 @@ Class Controller
 
     public function auth(Request $req, Response $res,array $args): Response
     {
-        if(!$req->hasHeader('Authorization'))
-        {
-            $res = $res->withStatus(401)
-                        ->withHeader('Content-Type','application/json')
-                        ->withHeader('WWW-authenticate');
-            $res->getBody()->write(json_encode(array(
-                'type' => 'error',
-                'error' => 401,
-                'message' => 'no authorization header present'
-            )));
-            return $res;
-        }
         $authString = base64_decode(explode(" ",$req->getHeader('Authorization')[0])[1]);
         list($user,$pass) = explode(':',$authString);
         try
@@ -71,58 +59,11 @@ Class Controller
 
     public function getCarte(Request $req, Response $res,array $args): Response
     {
-        if(!$req->hasHeader('Authorization'))
-        {
-            $res = $res->withStatus(401)
-                        ->withHeader('Content-Type','application/json')
-                        ->withHeader('WWW-authenticate');
-            $res->getBody()->write(json_encode(array(
-                'type' => 'error',
-                'error' => 401,
-                'message' => 'no authorization header present'
-            )));
-            return $res;
-        }
-
-        try
-        {
-            $secrets = $this->c['settings']['secrets'];
-            $h = $req->getHeader('Authorization')[0];
-            $tokenstring= sscanf($h, "Bearer %s")[0];
-            $token = JWT::decode($tokenstring, $secrets, ['HS512']);
-            $carte = Carte::Select('nom_client','mail_client','cumul_achats','cumul_commandes')->where('id','=',$token->cid)->firstOrFail();
-            $res = $res->withStatus(200)
-                        ->withHeader('Content-Type','application/json');
-            $res->getBody()->write(json_encode($carte));
-            return $res;
-        }
-        catch(ExpiredException $e)
-        {
-            $res = $res->withStatus(401)
-                        ->withHeader('Content-Type','application/json');
-            $res->getBody()->write(json_encode($e));
-            return $res;
-        }
-        catch(SignatureInvalidException $e)
-        {
-            $res = $res->withStatus(401)
-                        ->withHeader('Content-Type','application/json');
-            $res->getBody()->write(json_encode($e));
-            return $res;
-        }
-        catch (BeforeValidException $e)
-        {
-            $res = $res->withStatus(401)
-                        ->withHeader('Content-Type','application/json');
-            $res->getBody()->write(json_encode($e));
-            return $res;
-        }
-        catch(\UnexpectedValueException $e)
-        {
-            $res = $res->withStatus(401)
-                        ->withHeader('Content-Type','application/json');
-            $res->getBody()->write(json_encode($e));
-            return $res;
-        }
+        $token = $req->getAttribute('token');
+        $carte = Carte::Select('nom_client','mail_client','cumul_achats','cumul_commandes')->where('id','=',$token->cid)->firstOrFail();
+        $res = $res->withStatus(200)
+                    ->withHeader('Content-Type','application/json');
+        $res->getBody()->write(json_encode($carte));
+        return $res;
     }
 }
