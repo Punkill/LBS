@@ -37,14 +37,27 @@ class Controller
         $commande->token = $token;
         $commande->livraison = $date->format('Y-m-d').' '.$heure->format('H:i:s');
         $commande->status = 1;
+        //Sauvegarde de la commande
+        try
+        {
+            $commande->save();
+        }
+        catch(\Exception $e)
+        {
+            $res = $res->withStatus(500)
+                        ->withHeader('Content-Type','application/json');
+            $res->getBody()->write(json_encode($e->getmessage()));
+            return $res;
+        }
         $resultat = array();
+
         foreach($items as $item)
         {
             try
             {
                 $response = $client->get($item->uri);
                 $body = json_decode($response->getBody());
-                $commande->montant += $item->q * $body->sandwich->prix;
+
                 $itemDB = new Item();
                 $itemDB->uri = $item->uri;
                 $itemDB->libelle = $body->sandwich->nom;
@@ -52,6 +65,7 @@ class Controller
                 $itemDB->quantite = $item->q;
                 $itemDB->command_id = $commande->id;
                 $itemDB->save();
+                $commande->montant += $item->q * $body->sandwich->prix;
                 array_push($resultat,array(
                     'uri' => $itemDB->uri,
                     'libelle' => $itemDB->libelle,
@@ -66,18 +80,7 @@ class Controller
                 $commande->delete();
             }
         }
-        //Save de la commande
-        try
-        {
-            $commande->save();
-        }
-        catch(\Exception $e)
-        {
-            $res = $res->withStatus(500)
-                        ->withHeader('Content-Type','application/json');
-            $res->getBody()->write(json_encode($e->getmessage()));
-            return $res;
-        }
+
         $res = $res->withStatus(201)
                     ->withHeader('Content-Type','application/json');
         $res->getBody()->write(json_encode(array(
