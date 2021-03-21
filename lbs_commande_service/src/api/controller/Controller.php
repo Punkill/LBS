@@ -36,14 +36,13 @@ class Controller
             //'timeout' => 3.0,
         ]);
         $bodyReq = json_decode($req->getBody());
-        $items = $bodyReq->items;
         $commande = new Commande();
         $uuid1 = Uuid::uuid1();
         $token = random_bytes(32);
         $token = bin2hex($token);
         $date = date_create_from_format('d-m-Y',$bodyReq->livraison->date);
         $heure = date_create_from_format('H:i', $bodyReq->livraison->heure);
-        $montant = 0;
+        $commande->montant = 0;
         $commande->nom = filter_var($bodyReq->nom,FILTER_SANITIZE_SPECIAL_CHARS);
         $commande->mail = filter_var($bodyReq->mail,FILTER_VALIDATE_EMAIL);
         $commande->id = $uuid1;
@@ -64,33 +63,36 @@ class Controller
         }
         $resultat = array();
 
-        foreach($items as $item)
+        if(isset($bodyReq->items))
         {
-            try
+            foreach($bodyReq->items as $item)
             {
-                $response = $client->get($item->uri);
-                $body = json_decode($response->getBody());
-
-                $itemDB = new Item();
-                $itemDB->uri = $item->uri;
-                $itemDB->libelle = $body->sandwich->nom;
-                $itemDB->tarif = $body->sandwich->prix;
-                $itemDB->quantite = $item->q;
-                $itemDB->command_id = $commande->id;
-                $itemDB->save();
-                $commande->montant += $item->q * $body->sandwich->prix;
-                array_push($resultat,array(
-                    'uri' => $itemDB->uri,
-                    'libelle' => $itemDB->libelle,
-                    'tarif' => $itemDB->tarif,
-                    'quantite' => $itemDB->quantite
-                ));
-            }
-            catch(\Exception $e)
-            {
-                //Erreur not found a compléter
-                $code = $response->getStatusCode();
-                $commande->delete();
+                try
+                {
+                    $response = $client->get($item->uri);
+                    $body = json_decode($response->getBody());
+    
+                    $itemDB = new Item();
+                    $itemDB->uri = $item->uri;
+                    $itemDB->libelle = $body->sandwich->nom;
+                    $itemDB->tarif = $body->sandwich->prix;
+                    $itemDB->quantite = $item->q;
+                    $itemDB->command_id = $commande->id;
+                    $itemDB->save();
+                    $commande->montant += $item->q * $body->sandwich->prix;
+                    array_push($resultat,array(
+                        'uri' => $itemDB->uri,
+                        'libelle' => $itemDB->libelle,
+                        'tarif' => $itemDB->tarif,
+                        'quantite' => $itemDB->quantite
+                    ));
+                }
+                catch(\Exception $e)
+                {
+                    //Erreur not found a compléter
+                    $code = $response->getStatusCode();
+                    $commande->delete();
+                }
             }
         }
 
