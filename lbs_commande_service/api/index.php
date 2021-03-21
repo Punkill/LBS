@@ -16,7 +16,7 @@ use lbs\command\api\controller\Controller;
 
 $c = new \Slim\Container(array_merge($config_slim, $errors));
 $app = new \Slim\App($c);
-//$app->add(\lbs\command\api\middlewares\Cors::class.'checkAndAddCorsHeaders');
+$app->get('/commandes[/]',Controller::class.':getCommandes')->setName('getCommandes');
 $app->post('/commandes[/]', Controller::class.':createCommande')->setName('createCommande');
 $app->get('/commandes/{id}[/]', Controller::class.':getCommande')->setName('getCommande');
 $app->options('/{routes:.+}', function ($request, $response, $args) {

@@ -15,7 +15,20 @@ class Controller
         $this->c = $c;
     }
 
-    public function createCommande(Request $req, Response $res,array $args): Response
+    public function getCommandes(Request $req, Response $res, array $args): Response
+    {
+        $commandes = Commande::Select('id','mail','created_at','montant')->take(4)->get();
+        $result = array(
+            'type' => 'collection',
+            'count' => $commandes->count(),
+            'commandes' => $commandes
+        );
+        $res = $res->withStatus(200)
+                    ->withHeader('Content-Type','application/json');
+        $res->getBody()->write(json_encode($result));
+        return $res;
+    }
+    public function createCommande(Request $req, Response $res, array $args): Response
     {
         $client = new Client([
             'base_uri' => 'http://api.catalogue.local',
